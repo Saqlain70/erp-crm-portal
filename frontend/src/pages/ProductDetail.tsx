@@ -1,6 +1,6 @@
 import { FormEvent, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import api from '../api/client';
+import api, { API_BASE_URL } from '../api/client';
 import { Product } from '../types';
 import { StockBadge } from '../components/Badges';
 import { useAuth } from '../context/AuthContext';
@@ -78,7 +78,7 @@ export default function ProductDetail() {
             {product.imageUrl && (
               <div style={{ marginBottom: 12, textAlign: 'center' }}>
                 <img
-                  src={product.imageUrl}
+                  src={product.imageUrl.startsWith('http') ? product.imageUrl : `${API_BASE_URL}${product.imageUrl}`}
                   alt={product.name}
                   style={{ maxWidth: 200, maxHeight: 200, borderRadius: 8, objectFit: 'cover' }}
                   onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
