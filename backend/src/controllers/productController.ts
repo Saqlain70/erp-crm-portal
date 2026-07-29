@@ -1,7 +1,26 @@
 import { Response, NextFunction } from 'express';
+import path from 'path';
+import fs from 'fs';
 import prisma from '../prisma/client';
 import { ApiError } from '../middleware/errorHandler';
 import { AuthRequest } from '../middleware/auth';
+
+// Upload product image — stores locally; can be swapped to S3 by changing the save logic.
+export async function uploadProductImage(req: AuthRequest, res: Response, next: NextFunction) {
+  try {
+    if (!req.file) throw new ApiError(400, 'No image file provided');
+
+    const product = await prisma.product.findUnique({ where: { id: req.params.id } });
+    if (!product) throw new ApiError(404, 'Product not found');
+
+    const imageUrl = `/uploads/${req.file.filename}`;
+    await prisma.product.update({ where: { id: product.id }, data: { imageUrl } });
+
+    res.json({ imageUrl });
+  } catch (err) {
+    next(err);
+  }
+}
 
 export async function createProduct(req: AuthRequest, res: Response, next: NextFunction) {
   try {

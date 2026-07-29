@@ -1,7 +1,9 @@
 import { Router } from 'express';
 import { body } from 'express-validator';
+import multer from 'multer';
+import path from 'path';
 import {
-  createProduct, listProducts, getProduct, updateProduct, adjustStock,
+  createProduct, listProducts, getProduct, updateProduct, adjustStock, uploadProductImage,
 } from '../controllers/productController';
 import { validate } from '../middleware/validate';
 import { authenticate, authorize } from '../middleware/auth';
@@ -9,6 +11,25 @@ import { authenticate, authorize } from '../middleware/auth';
 const router = Router();
 
 router.use(authenticate);
+
+// Multer configuration for product image uploads
+const storage = multer.diskStorage({
+  destination: path.join(__dirname, '..', '..', 'uploads'),
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname);
+    cb(null, `product-${Date.now()}${ext}`);
+  },
+});
+const upload = multer({
+  storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+  fileFilter: (req, file, cb) => {
+    const allowed = ['.jpg', '.jpeg', '.png', '.webp', '.gif'];
+    const ext = path.extname(file.originalname).toLowerCase();
+    if (allowed.includes(ext)) cb(null, true);
+    else cb(new Error('Only image files (jpg, png, webp, gif) are allowed'));
+  },
+});
 
 const productValidation = [
   body('name').notEmpty().withMessage('Product name is required'),
@@ -32,5 +53,6 @@ router.post(
   validate,
   adjustStock
 );
+router.post('/:id/upload-image', authorize('ADMIN', 'WAREHOUSE'), upload.single('image'), uploadProductImage);
 
 export default router;

@@ -62,29 +62,25 @@ async function main() {
   });
 
   const products = await Promise.all([
-    prisma.product.create({
-      data: {
-        name: 'LED Bulb 9W', sku: 'LED-9W-001', category: 'Electrical',
-        unitPrice: 85.0, currentStock: 500, minStockAlertQty: 50, location: 'Warehouse A - Rack 1',
-      },
+    prisma.product.upsert({
+      where: { sku: 'LED-9W-001' },
+      update: { name: 'LED Bulb 9W', category: 'Electrical', unitPrice: 85.0, currentStock: 500, minStockAlertQty: 50, location: 'Warehouse A - Rack 1' },
+      create: { name: 'LED Bulb 9W', sku: 'LED-9W-001', category: 'Electrical', unitPrice: 85.0, currentStock: 500, minStockAlertQty: 50, location: 'Warehouse A - Rack 1' },
     }),
-    prisma.product.create({
-      data: {
-        name: 'Copper Wire 1.5mm (100m)', sku: 'WIRE-1.5-100', category: 'Electrical',
-        unitPrice: 1450.0, currentStock: 40, minStockAlertQty: 10, location: 'Warehouse A - Rack 3',
-      },
+    prisma.product.upsert({
+      where: { sku: 'WIRE-1.5-100' },
+      update: { name: 'Copper Wire 1.5mm (100m)', category: 'Electrical', unitPrice: 1450.0, currentStock: 40, minStockAlertQty: 10, location: 'Warehouse A - Rack 3' },
+      create: { name: 'Copper Wire 1.5mm (100m)', sku: 'WIRE-1.5-100', category: 'Electrical', unitPrice: 1450.0, currentStock: 40, minStockAlertQty: 10, location: 'Warehouse A - Rack 3' },
     }),
-    prisma.product.create({
-      data: {
-        name: 'MCB Switch 32A', sku: 'MCB-32A', category: 'Electrical',
-        unitPrice: 220.0, currentStock: 8, minStockAlertQty: 15, location: 'Warehouse A - Rack 2',
-      },
+    prisma.product.upsert({
+      where: { sku: 'MCB-32A' },
+      update: { name: 'MCB Switch 32A', category: 'Electrical', unitPrice: 220.0, currentStock: 8, minStockAlertQty: 15, location: 'Warehouse A - Rack 2' },
+      create: { name: 'MCB Switch 32A', sku: 'MCB-32A', category: 'Electrical', unitPrice: 220.0, currentStock: 8, minStockAlertQty: 15, location: 'Warehouse A - Rack 2' },
     }),
-    prisma.product.create({
-      data: {
-        name: 'PVC Pipe 1 inch (3m)', sku: 'PVC-1IN-3M', category: 'Plumbing',
-        unitPrice: 180.0, currentStock: 200, minStockAlertQty: 30, location: 'Warehouse B - Rack 1',
-      },
+    prisma.product.upsert({
+      where: { sku: 'PVC-1IN-3M' },
+      update: { name: 'PVC Pipe 1 inch (3m)', category: 'Plumbing', unitPrice: 180.0, currentStock: 200, minStockAlertQty: 30, location: 'Warehouse B - Rack 1' },
+      create: { name: 'PVC Pipe 1 inch (3m)', sku: 'PVC-1IN-3M', category: 'Plumbing', unitPrice: 180.0, currentStock: 200, minStockAlertQty: 30, location: 'Warehouse B - Rack 1' },
     }),
   ]);
 

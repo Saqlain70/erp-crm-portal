@@ -16,12 +16,32 @@ export default function ProductDetail() {
   const [reason, setReason] = useState('');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
 
   function load() {
     api.get(`/products/${id}`).then((res) => setProduct(res.data));
   }
 
   useEffect(load, [id]);
+
+  async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    setError(null);
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+      await api.post(`/products/${id}/upload-image`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      load();
+    } catch (err: any) {
+      setError(err.response?.data?.error || err.message || 'Failed to upload image');
+    } finally {
+      setUploading(false);
+    }
+  }
 
   async function handleAdjust(e: FormEvent) {
     e.preventDefault();
@@ -55,6 +75,16 @@ export default function ProductDetail() {
         <div>
           <div className="section-title">Details</div>
           <div className="card">
+            {product.imageUrl && (
+              <div style={{ marginBottom: 12, textAlign: 'center' }}>
+                <img
+                  src={product.imageUrl}
+                  alt={product.name}
+                  style={{ maxWidth: 200, maxHeight: 200, borderRadius: 8, objectFit: 'cover' }}
+                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                />
+              </div>
+            )}
             <div className="kv-row"><span className="k">Unit price</span><span className="v">₹{Number(product.unitPrice).toFixed(2)}</span></div>
             <div className="kv-row"><span className="k">Current stock</span><span className="v">{product.currentStock}</span></div>
             <div className="kv-row"><span className="k">Min alert quantity</span><span className="v">{product.minStockAlertQty}</span></div>
@@ -87,6 +117,15 @@ export default function ProductDetail() {
 
         {canEdit && (
           <div>
+            <div className="section-title">Product image</div>
+            <div className="card" style={{ marginBottom: 16 }}>
+              <label className="btn btn-outline btn-sm" style={{ cursor: 'pointer', display: 'inline-flex' }}>
+                {uploading ? 'Uploading…' : 'Upload image'}
+                <input type="file" accept="image/*" style={{ display: 'none' }} onChange={handleImageUpload} disabled={uploading} />
+              </label>
+              <p style={{ fontSize: 11, color: 'var(--ink-400)', margin: '8px 0 0' }}>Supports JPG, PNG, WebP (max 5MB)</p>
+            </div>
+
             <div className="section-title">Adjust stock</div>
             <div className="card">
               {error && <div className="alert alert-error">{error}</div>}

@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { body } from 'express-validator';
 import {
-  createChallan, listChallans, getChallan, confirmChallan, cancelChallan,
+  createChallan, listChallans, getChallan, confirmChallan, cancelChallan, generateInvoice,
 } from '../controllers/challanController';
 import { validate } from '../middleware/validate';
 import { authenticate, authorize } from '../middleware/auth';
@@ -29,5 +29,6 @@ router.get('/', listChallans);
 router.get('/:id', getChallan);
 router.post('/:id/confirm', authorize('ADMIN', 'SALES'), confirmChallan);
 router.post('/:id/cancel', authorize('ADMIN', 'SALES'), cancelChallan);
+router.get('/:id/invoice', authorize('ADMIN', 'SALES', 'ACCOUNTS'), generateInvoice);
 
 export default router;

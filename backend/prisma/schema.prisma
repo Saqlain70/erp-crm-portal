@@ -102,6 +102,7 @@ model Product {
   currentStock      Int      @default(0)
   minStockAlertQty  Int      @default(0)
   location          String?
+  imageUrl          String?
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 

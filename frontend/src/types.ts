@@ -44,6 +44,7 @@ export interface Product {
   currentStock: number;
   minStockAlertQty: number;
   location?: string | null;
+  imageUrl?: string | null;
   stockMovements?: StockMovement[];
 }
 

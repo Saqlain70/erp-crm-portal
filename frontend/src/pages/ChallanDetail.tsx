@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import api from '../api/client';
+import api, { API_BASE_URL } from '../api/client';
 import { SalesChallan } from '../types';
 import { StatusBadge } from '../components/Badges';
 import { useAuth } from '../context/AuthContext';
@@ -90,6 +90,11 @@ export default function ChallanDetail() {
         {canAct && challan.status === 'DRAFT' && (
           <button className="btn btn-success" onClick={handleConfirm} disabled={busy}>
             {busy ? 'Confirming…' : 'Confirm challan (reduce stock)'}
+          </button>
+        )}
+        {challan.status === 'CONFIRMED' && (
+          <button className="btn btn-amber" onClick={() => window.open(`${API_BASE_URL}/challans/${id}/invoice`, '_blank')}>
+            Download invoice (PDF)
           </button>
         )}
         {canAct && challan.status !== 'CANCELLED' && (
