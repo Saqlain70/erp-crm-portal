@@ -4,11 +4,15 @@ import multer from 'multer';
 import path from 'path';
 import {
   createProduct, listProducts, getProduct, updateProduct, adjustStock, uploadProductImage,
+  serveProductImage,
 } from '../controllers/productController';
 import { validate } from '../middleware/validate';
 import { authenticate, authorize } from '../middleware/auth';
 
 const router = Router();
+
+// Public route — serves product images without auth (browser <img> tags can't send Bearer tokens)
+router.get('/:id/image', serveProductImage);
 
 router.use(authenticate);
 

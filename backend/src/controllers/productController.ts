@@ -6,6 +6,26 @@ import { ApiError } from '../middleware/errorHandler';
 import { AuthRequest } from '../middleware/auth';
 
 // Upload product image — stores locally; can be swapped to S3 by changing the save logic.
+// Serve product image with guaranteed cross-origin headers (fixes ERR_BLOCKED_BY_RESPONSE.NotSameOrigin)
+export async function serveProductImage(req: AuthRequest, res: Response, next: NextFunction) {
+  try {
+    const product = await prisma.product.findUnique({ where: { id: req.params.id } });
+    if (!product || !product.imageUrl) throw new ApiError(404, 'Image not found');
+
+    const filename = path.basename(product.imageUrl);
+    const filePath = path.join(__dirname, '..', '..', 'uploads', filename);
+
+    if (!fs.existsSync(filePath)) throw new ApiError(404, 'Image file not found on disk');
+
+    res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Cache-Control', 'public, max-age=86400');
+    res.sendFile(filePath);
+  } catch (err) {
+    next(err);
+  }
+}
+
 export async function uploadProductImage(req: AuthRequest, res: Response, next: NextFunction) {
   try {
     if (!req.file) throw new ApiError(400, 'No image file provided');

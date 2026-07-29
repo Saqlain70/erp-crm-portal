@@ -78,7 +78,7 @@ export default function ProductDetail() {
             {product.imageUrl && (
               <div style={{ marginBottom: 12, textAlign: 'center' }}>
                 <img
-                  src={product.imageUrl.startsWith('http') ? product.imageUrl : `${API_BASE_URL}${product.imageUrl}`}
+                  src={`${API_BASE_URL}/products/${product.id}/image`}
                   alt={product.name}
                   style={{ maxWidth: 200, maxHeight: 200, borderRadius: 8, objectFit: 'cover' }}
                   onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
