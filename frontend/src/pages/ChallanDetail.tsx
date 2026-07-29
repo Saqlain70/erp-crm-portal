@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import api, { API_BASE_URL } from '../api/client';
+import api from '../api/client';
 import { SalesChallan } from '../types';
 import { StatusBadge } from '../components/Badges';
 import { useAuth } from '../context/AuthContext';
@@ -44,6 +44,22 @@ export default function ChallanDetail() {
       setError(err.response?.data?.error || 'Failed to cancel challan');
     } finally {
       setBusy(false);
+    }
+  }
+
+  async function handleDownloadInvoice() {
+    try {
+      const res = await api.get(`/challans/${id}/invoice`, { responseType: 'blob' });
+      const url = window.URL.createObjectURL(new Blob([res.data]));
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `invoice-${challan?.challanNumber || id}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    } catch (err: any) {
+      setError(err.response?.data?.error || 'Failed to download invoice');
     }
   }
 
@@ -93,7 +109,7 @@ export default function ChallanDetail() {
           </button>
         )}
         {challan.status === 'CONFIRMED' && (
-          <button className="btn btn-amber" onClick={() => window.open(`${API_BASE_URL}/challans/${id}/invoice`, '_blank')}>
+          <button className="btn btn-amber" onClick={handleDownloadInvoice}>
             Download invoice (PDF)
           </button>
         )}
